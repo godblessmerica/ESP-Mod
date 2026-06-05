@@ -31,6 +31,67 @@ public class ESPConfig {
 
     public static Map<String, EntitySettings> entityOverrides = new ConcurrentHashMap<>();
 
+    private static String categoryOf(EntityType<?> t) {
+        if (t == EntityType.PLAYER) return "player";
+        if (t.getCategory() != MobCategory.MISC || isMiscMob(t)) return "mob";
+        String p = keyPath(t);
+        if (p.contains("boat") || p.contains("raft") || p.contains("minecart")) return "vehicle";
+        if (p.contains("area_effect_cloud") || p.contains("marker")   ||
+            p.contains("interaction")       || p.contains("_display") ||
+            p.contains("lightning")         || p.contains("falling_block") ||
+            p.contains("end_crystal")       || p.contains("end_gateway")) return "technical";
+        return "other";
+    }
+
+    private static boolean allDisabledInCategory(String category) {
+        for (EntityType<?> t : BuiltInRegistries.ENTITY_TYPE) {
+            if (!categoryOf(t).equals(category)) continue;
+            EntitySettings ov = entityOverrides.get(EntityType.getKey(t).toString());
+            if (ov == null || ov.enabled) return false;
+        }
+        return true;
+    }
+
+    private static boolean allEnabledInCategory(String category) {
+        for (EntityType<?> t : BuiltInRegistries.ENTITY_TYPE) {
+            if (!categoryOf(t).equals(category)) continue;
+            EntitySettings ov = entityOverrides.get(EntityType.getKey(t).toString());
+            if (ov == null || !ov.enabled) return false;
+        }
+        return true;
+    }
+
+    public static void syncPresetOnEnable(EntityType<?> type) {
+        String cat = categoryOf(type);
+        if (cat.equals("player")) { playerESP = true; return; }
+        if (allEnabledInCategory(cat)) {
+            if (cat.equals("mob"))            mobESP       = true;
+            else if (cat.equals("vehicle"))   vehicleESP   = true;
+            else if (cat.equals("technical")) technicalESP = true;
+        }
+    }
+
+    public static void syncPresetOnDisable(EntityType<?> type) {
+        allEntityESP = false;
+        String cat = categoryOf(type);
+        if (cat.equals("player")) { playerESP = false; return; }
+        if (allDisabledInCategory(cat)) {
+            if (cat.equals("mob"))       mobESP       = false;
+            else if (cat.equals("vehicle"))   vehicleESP   = false;
+            else if (cat.equals("technical")) technicalESP = false;
+        }
+    }
+
+    public static void resetAll() {
+        playerESP    = false;
+        mobESP       = false;
+        vehicleESP   = false;
+        technicalESP = false;
+        allEntityESP = false;
+        entityOverrides.clear();
+        save();
+    }
+
     public static void applyPlayerPreset(boolean enabled) {
         for (EntityType<?> t : BuiltInRegistries.ENTITY_TYPE) {
             if (t == EntityType.PLAYER) {
@@ -128,6 +189,7 @@ public class ESPConfig {
         try (Reader reader = Files.newBufferedReader(CONFIG_PATH)) {
             Data data = GSON.fromJson(reader, Data.class);
             if (data != null) {
+                enabled         = data.enabled;
                 playerESP       = data.playerESP;
                 mobESP          = data.mobESP;
                 vehicleESP      = data.vehicleESP;
@@ -155,6 +217,7 @@ public class ESPConfig {
     }
 
     private static class Data {
+        boolean enabled      = ESPConfig.enabled;
         boolean playerESP    = ESPConfig.playerESP;
         boolean mobESP       = ESPConfig.mobESP;
         boolean vehicleESP    = ESPConfig.vehicleESP;

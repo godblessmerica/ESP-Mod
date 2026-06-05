@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.PlainTextButton;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -223,6 +222,8 @@ public class AdvancedESPScreen extends Screen {
                         if (ov != null) ov.enabled = val;
                         else ESPConfig.entityOverrides.put(typeId,
                             new EntitySettings(val, ESPConfig.showOutline, ESPConfig.showHitbox));
+                        if (!val) ESPConfig.syncPresetOnDisable(type);
+                        else ESPConfig.syncPresetOnEnable(type);
                         ESPConfig.save();
                     });
             }
@@ -235,7 +236,6 @@ public class AdvancedESPScreen extends Screen {
             @Override
             public void extractContent(GuiGraphicsExtractor g, int mx, int my, boolean hovered, float delta) {
                 int cx = getContentX(), cy = getContentY(), w = getContentWidth(), h = getContentHeight();
-                var font = Minecraft.getInstance().font;
 
                 g.fill(cx, cy, cx + w, cy + h, hovered ? 0xFF3A3A3A : 0xFF111111);
 

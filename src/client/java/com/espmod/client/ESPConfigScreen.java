@@ -52,6 +52,8 @@ public class ESPConfigScreen extends Screen {
             () -> ESPConfig.showHitbox, v -> ESPConfig.showHitbox = v));
 
         list.addEntry(new SettingsList.HeaderEntry("Entities"));
+        list.addEntry(new SettingsList.ButtonEntry("Clear All",
+            () -> ESPConfig.resetAll()));
         list.addEntry(new SettingsList.ToggleEntry("Players",
             () -> ESPConfig.playerESP, v -> {
                 ESPConfig.playerESP = v;
@@ -77,7 +79,10 @@ public class ESPConfigScreen extends Screen {
                 else ESPConfig.applyTechnicalPreset(v);
             }));
         list.addEntry(new SettingsList.ToggleEntry("All Entities",
-            () -> ESPConfig.allEntityESP, v -> { ESPConfig.allEntityESP = v; ESPConfig.applyAllEntitiesPreset(v); }));
+            () -> ESPConfig.allEntityESP, v -> {
+                ESPConfig.allEntityESP = v;
+                ESPConfig.applyAllEntitiesPreset(v);
+            }));
         list.addEntry(new SettingsList.ButtonEntry("Advanced Entity Settings...",
             () -> this.minecraft.setScreen(new AdvancedESPScreen(this))));
 
@@ -241,6 +246,8 @@ public class ESPConfigScreen extends Screen {
             }
             @Override public boolean mouseClicked(MouseButtonEvent e, boolean bl) { return btn.mouseClicked(e, bl); }
         }
+
+
 
         abstract static class BaseEntry extends AbstractSelectionList.Entry<BaseEntry> {
             @Override public abstract void extractContent(GuiGraphicsExtractor g, int mx, int my, boolean hovered, float delta);
