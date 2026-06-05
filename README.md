@@ -7,6 +7,10 @@
 
 A client-side Fabric mod that lets you see entity outlines and hitboxes through walls. Supports players, mobs, vehicles, and more - with per-entity control and an in-game config menu.
 
+## ⚠️ Disclaimer
+
+> This mod is intended for use on servers you own or have explicit permission to use it on. Using ESP mods on public or third-party servers likely violates their rules and may result in a ban. The author is not responsible for any consequences resulting from misuse of this mod. Use it at your own risk.
+
 ## Installation
 1. Install [Fabric Loader](https://fabricmc.net/use/installer/)
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) and place it in your mods folder
