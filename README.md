@@ -28,7 +28,7 @@ A client-side Fabric mod that lets you see entity outlines and hitboxes through 
 See glowing entity outlines through walls using the same effect as the spectral arrow. Works on any entity type you have enabled.
 
 ### Hitbox ESP
-See colored wireframe boxes rendered around entities through walls. Players appear in red, mobs in orange, and other entities in yellow.
+See colored wireframe boxes rendered around entities (is currently broken and doesnt show through walls.) Players appear in red, mobs in orange, and other entities in yellow.
 
 ### Entity Presets
 Quick toggles for **Players**, **Mobs**, **Vehicles**, **Technical**, and **All Entities**. Each preset bulk-updates the individual entity settings in the advanced panel.
