@@ -9,7 +9,7 @@ import net.minecraft.resources.Identifier;
 import com.mojang.blaze3d.platform.InputConstants;
 import org.lwjgl.glfw.GLFW;
 
-public class PlayerESPClient implements ClientModInitializer {
+public class ESPModClient implements ClientModInitializer {
 
     // Custom keybind category — shows as "ESP Mod" in Controls screen
     public static final KeyMapping.Category CATEGORY =

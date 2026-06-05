@@ -67,8 +67,8 @@ public class ESPConfigScreen extends Screen {
             () -> this.minecraft.setScreen(new AdvancedESPScreen(this))));
 
         list.addEntry(new SettingsList.HeaderEntry("Controls"));
-        list.addEntry(new SettingsList.KeyBindEntry("Toggle ESP",      PlayerESPClient.toggleKey));
-        list.addEntry(new SettingsList.KeyBindEntry("Open Menu",       PlayerESPClient.openScreenKey));
+        list.addEntry(new SettingsList.KeyBindEntry("Toggle ESP",      ESPModClient.toggleKey));
+        list.addEntry(new SettingsList.KeyBindEntry("Open Menu",       ESPModClient.openScreenKey));
 
         addRenderableWidget(list);
 

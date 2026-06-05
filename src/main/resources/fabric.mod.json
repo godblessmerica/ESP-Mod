@@ -10,7 +10,7 @@
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"com.espmod.client.PlayerESPClient"
+			"com.espmod.client.ESPModClient"
 		],
 		"modmenu": [
 			"com.espmod.client.ModMenuIntegration"
