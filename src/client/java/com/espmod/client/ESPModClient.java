@@ -11,7 +11,6 @@ import org.lwjgl.glfw.GLFW;
 
 public class ESPModClient implements ClientModInitializer {
 
-    // Custom keybind category — shows as "ESP Mod" in Controls screen
     public static final KeyMapping.Category CATEGORY =
         KeyMapping.Category.register(Identifier.fromNamespaceAndPath("espmod", "esp_mod"));
 

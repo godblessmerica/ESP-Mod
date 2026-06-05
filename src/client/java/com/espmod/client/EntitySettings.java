@@ -11,7 +11,6 @@ public class EntitySettings {
         this.showHitbox  = showHitbox;
     }
 
-    // Returns a copy with global defaults applied
     public static EntitySettings fromGlobals() {
         return new EntitySettings(true, ESPConfig.showOutline, ESPConfig.showHitbox);
     }

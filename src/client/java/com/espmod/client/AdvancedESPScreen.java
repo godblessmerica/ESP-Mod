@@ -91,7 +91,6 @@ public class AdvancedESPScreen extends Screen {
         int boxX = (this.width  - BOX_W) / 2;
         int boxY = (this.height - BOX_H) / 2;
 
-        // Title
         int titleTextW = this.font.width("Advanced Entity Settings");
         var titleLabel = new StringWidget(
             Component.literal("Advanced Entity Settings").withStyle(s -> s.withColor(0xFFFFFF)),
@@ -106,12 +105,10 @@ public class AdvancedESPScreen extends Screen {
         int listY = searchY + SEARCH_H;
         int listH = BOX_H - TITLE_H - SEARCH_H - FOOTER_H;
 
-        // Add list FIRST so it renders before the EditBox sets any clip state
         list = new EntityList(this.minecraft, BOX_W, listH, listY, 22);
         list.setX(boxX);
         addRenderableWidget(list);
 
-        // Search box added AFTER list
         searchBox = new EditBox(this.font,
             boxX + 4, searchY, BOX_W - 8, SEARCH_H - 4,
             Component.literal("Search..."));
@@ -121,7 +118,6 @@ public class AdvancedESPScreen extends Screen {
         addRenderableWidget(searchBox);
         rebuild("");
 
-        // Done
         addRenderableWidget(Button.builder(Component.literal("Done"),
                 btn -> { ESPConfig.save(); this.minecraft.setScreen(parent); })
             .bounds(boxX + BOX_W / 2 - 60, boxY + BOX_H - 26, 120, 20).build());
@@ -160,8 +156,6 @@ public class AdvancedESPScreen extends Screen {
 
     @Override
     public void onClose() { ESPConfig.save(); this.minecraft.setScreen(parent); }
-
-    // ─────────────────────────────────────────────────────────────────
 
     static class EntityList extends AbstractSelectionList<EntityList.BaseEntry> {
         EntityList(Minecraft mc, int w, int h, int y, int ih) { super(mc, w, h, y, ih); }

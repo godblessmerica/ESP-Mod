@@ -16,8 +16,6 @@ public class HitboxRenderer {
     private static final int COLOR_ENTITY = 0xFFFFFF55;
 
     public static void register() {
-        // END_EXTRACTION is when the per-frame gizmo collector is active.
-        // Gizmos use world-space coordinates — no camera offset needed.
         LevelRenderEvents.END_EXTRACTION.register(context -> {
             if (!ESPConfig.enabled || !ESPConfig.showHitbox) return;
 

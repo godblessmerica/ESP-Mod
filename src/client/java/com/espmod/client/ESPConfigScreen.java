@@ -28,7 +28,6 @@ public class ESPConfigScreen extends Screen {
     private static final int TITLE_H  = 22;
     private static final int FOOTER_H = 32;
 
-    // Which keybind is currently waiting for a key press (null = not listening)
     static KeyMapping listeningFor = null;
 
     public ESPConfigScreen(Screen parent) {
@@ -90,7 +89,6 @@ public class ESPConfigScreen extends Screen {
     public boolean keyPressed(KeyEvent event) {
         if (listeningFor != null) {
             InputConstants.Key newKey = InputConstants.getKey(event);
-            // Escape cancels rebinding
             if (newKey.getValue() != org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
                 listeningFor.setKey(newKey);
                 KeyMapping.resetMapping();
@@ -114,8 +112,6 @@ public class ESPConfigScreen extends Screen {
 
     @Override
     public void onClose() { ESPConfig.save(); listeningFor = null; this.minecraft.setScreen(parent); }
-
-    // ─────────────────────────────────────────────────────────────────
 
     static class SettingsList extends AbstractSelectionList<SettingsList.BaseEntry> {
         SettingsList(Minecraft mc, int w, int h, int y, int ih) { super(mc, w, h, y, ih); }
@@ -173,7 +169,6 @@ public class ESPConfigScreen extends Screen {
             @Override public boolean mouseClicked(MouseButtonEvent e, boolean bl) { return btn.mouseClicked(e, bl); }
         }
 
-        // ── Keybind row ──────────────────────────────────────────────
         static class KeyBindEntry extends BaseEntry {
             private final String label;
             private final KeyMapping mapping;
@@ -200,7 +195,6 @@ public class ESPConfigScreen extends Screen {
                 labelWidget.setWidth(w - 91); labelWidget.setHeight(8);
                 labelWidget.extractRenderState(g, mx, my, delta);
 
-                // Update button label — show "> Press key <" when listening
                 Component keyLabel = listening
                     ? Component.literal("> Press key <").withStyle(s -> s.withColor(0xFFFF55))
                     : KeyMappingHelper.getBoundKeyOf(mapping).getDisplayName();

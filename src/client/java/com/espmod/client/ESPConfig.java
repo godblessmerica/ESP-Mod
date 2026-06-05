@@ -20,21 +20,16 @@ public class ESPConfig {
 
     public static boolean enabled = false;
 
-    // UI state for the main menu preset buttons (all off by default)
     public static boolean playerESP    = false;
     public static boolean mobESP       = false;
     public static boolean vehicleESP    = false;
     public static boolean technicalESP  = false;
     public static boolean allEntityESP  = false;
 
-    // Global display mode
     public static boolean showOutline = true;
     public static boolean showHitbox  = false;
 
-    // Per-entity visibility — this is the ACTUAL source of truth for rendering
     public static Map<String, EntitySettings> entityOverrides = new HashMap<>();
-
-    // ── Preset helpers ────────────────────────────────────────────────
 
     public static void applyPlayerPreset(boolean enabled) {
         for (EntityType<?> t : BuiltInRegistries.ENTITY_TYPE) {
@@ -81,7 +76,6 @@ public class ESPConfig {
             if (enabled) {
                 entityEnabled = true;
             } else {
-                // Turning all off: restore whatever preset flags say
                 String p = EntityType.getKey(t).toString();
                 if (t == EntityType.PLAYER)
                     entityEnabled = playerESP;
@@ -102,13 +96,9 @@ public class ESPConfig {
         }
     }
 
-    // ── Rendering lookup ──────────────────────────────────────────────
-
     public static EntitySettings getOverride(Entity entity) {
         return entityOverrides.get(EntityType.getKey(entity.getType()).toString());
     }
-
-    // ── Persistence ───────────────────────────────────────────────────
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance()
@@ -116,7 +106,6 @@ public class ESPConfig {
 
     public static void load() {
         if (!Files.exists(CONFIG_PATH)) {
-            // First install: default to players shown, everything else off
             playerESP = true;
             applyPlayerPreset(true);
             save();
