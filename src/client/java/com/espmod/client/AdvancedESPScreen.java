@@ -52,7 +52,11 @@ public class AdvancedESPScreen extends Screen {
         if (type == EntityType.PLAYER) return Cat.PLAYERS;
         MobCategory mc = type.getCategory();
         if (mc != MobCategory.MISC) return Cat.MOBS;
-        String p = EntityType.getKey(type).toString();
+        String full = EntityType.getKey(type).toString();
+        String p = full.contains(":") ? full.substring(full.indexOf(':') + 1) : full;
+        if (p.equals("villager") || p.equals("wandering_trader") ||
+            p.equals("iron_golem") || p.equals("snow_golem") ||
+            p.equals("trader_llama")) return Cat.MOBS;
         if (p.contains("area_effect_cloud") || p.contains("marker")   ||
             p.contains("interaction")       || p.contains("_display") ||
             p.contains("lightning")         || p.contains("falling_block") ||

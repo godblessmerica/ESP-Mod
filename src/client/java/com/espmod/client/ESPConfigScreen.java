@@ -53,13 +53,29 @@ public class ESPConfigScreen extends Screen {
 
         list.addEntry(new SettingsList.HeaderEntry("Entities"));
         list.addEntry(new SettingsList.ToggleEntry("Players",
-            () -> ESPConfig.playerESP, v -> { ESPConfig.playerESP = v; ESPConfig.applyPlayerPreset(v); }));
+            () -> ESPConfig.playerESP, v -> {
+                ESPConfig.playerESP = v;
+                if (ESPConfig.allEntityESP) { ESPConfig.allEntityESP = false; ESPConfig.applyAllEntitiesPreset(false); }
+                else ESPConfig.applyPlayerPreset(v);
+            }));
         list.addEntry(new SettingsList.ToggleEntry("Mobs",
-            () -> ESPConfig.mobESP, v -> { ESPConfig.mobESP = v; ESPConfig.applyMobPreset(v); }));
+            () -> ESPConfig.mobESP, v -> {
+                ESPConfig.mobESP = v;
+                if (ESPConfig.allEntityESP) { ESPConfig.allEntityESP = false; ESPConfig.applyAllEntitiesPreset(false); }
+                else ESPConfig.applyMobPreset(v);
+            }));
         list.addEntry(new SettingsList.ToggleEntry("Vehicles",
-            () -> ESPConfig.vehicleESP, v -> { ESPConfig.vehicleESP = v; ESPConfig.applyVehiclePreset(v); }));
+            () -> ESPConfig.vehicleESP, v -> {
+                ESPConfig.vehicleESP = v;
+                if (ESPConfig.allEntityESP) { ESPConfig.allEntityESP = false; ESPConfig.applyAllEntitiesPreset(false); }
+                else ESPConfig.applyVehiclePreset(v);
+            }));
         list.addEntry(new SettingsList.ToggleEntry("Technical",
-            () -> ESPConfig.technicalESP, v -> { ESPConfig.technicalESP = v; ESPConfig.applyTechnicalPreset(v); }));
+            () -> ESPConfig.technicalESP, v -> {
+                ESPConfig.technicalESP = v;
+                if (ESPConfig.allEntityESP) { ESPConfig.allEntityESP = false; ESPConfig.applyAllEntitiesPreset(false); }
+                else ESPConfig.applyTechnicalPreset(v);
+            }));
         list.addEntry(new SettingsList.ToggleEntry("All Entities",
             () -> ESPConfig.allEntityESP, v -> { ESPConfig.allEntityESP = v; ESPConfig.applyAllEntitiesPreset(v); }));
         list.addEntry(new SettingsList.ButtonEntry("Advanced Entity Settings...",

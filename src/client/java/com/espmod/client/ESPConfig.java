@@ -13,8 +13,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ESPConfig {
 
@@ -29,7 +29,7 @@ public class ESPConfig {
     public static boolean showOutline = true;
     public static boolean showHitbox  = false;
 
-    public static Map<String, EntitySettings> entityOverrides = new HashMap<>();
+    public static Map<String, EntitySettings> entityOverrides = new ConcurrentHashMap<>();
 
     public static void applyPlayerPreset(boolean enabled) {
         for (EntityType<?> t : BuiltInRegistries.ENTITY_TYPE) {
@@ -40,9 +40,21 @@ public class ESPConfig {
         }
     }
 
+    private static String keyPath(EntityType<?> t) {
+        String full = EntityType.getKey(t).toString();
+        return full.contains(":") ? full.substring(full.indexOf(':') + 1) : full;
+    }
+
+    private static boolean isMiscMob(EntityType<?> t) {
+        String p = keyPath(t);
+        return p.equals("villager") || p.equals("wandering_trader") ||
+               p.equals("iron_golem") || p.equals("snow_golem") ||
+               p.equals("trader_llama");
+    }
+
     public static void applyMobPreset(boolean enabled) {
         for (EntityType<?> t : BuiltInRegistries.ENTITY_TYPE) {
-            if (t != EntityType.PLAYER && t.getCategory() != MobCategory.MISC) {
+            if (t != EntityType.PLAYER && (t.getCategory() != MobCategory.MISC || isMiscMob(t))) {
                 entityOverrides.put(EntityType.getKey(t).toString(),
                     new EntitySettings(enabled, showOutline, showHitbox));
             }
@@ -51,21 +63,23 @@ public class ESPConfig {
 
     public static void applyVehiclePreset(boolean enabled) {
         for (EntityType<?> t : BuiltInRegistries.ENTITY_TYPE) {
-            String p = EntityType.getKey(t).toString();
+            String p = keyPath(t);
             if (p.contains("boat") || p.contains("raft") || p.contains("minecart")) {
-                entityOverrides.put(p, new EntitySettings(enabled, showOutline, showHitbox));
+                entityOverrides.put(EntityType.getKey(t).toString(),
+                    new EntitySettings(enabled, showOutline, showHitbox));
             }
         }
     }
 
     public static void applyTechnicalPreset(boolean enabled) {
         for (EntityType<?> t : BuiltInRegistries.ENTITY_TYPE) {
-            String p = EntityType.getKey(t).toString();
+            String p = keyPath(t);
             if (p.contains("area_effect_cloud") || p.contains("marker")   ||
                 p.contains("interaction")       || p.contains("_display") ||
                 p.contains("lightning")         || p.contains("falling_block") ||
                 p.contains("end_crystal")       || p.contains("end_gateway")) {
-                entityOverrides.put(p, new EntitySettings(enabled, showOutline, showHitbox));
+                entityOverrides.put(EntityType.getKey(t).toString(),
+                    new EntitySettings(enabled, showOutline, showHitbox));
             }
         }
     }
@@ -76,10 +90,10 @@ public class ESPConfig {
             if (enabled) {
                 entityEnabled = true;
             } else {
-                String p = EntityType.getKey(t).toString();
+                String p = keyPath(t);
                 if (t == EntityType.PLAYER)
                     entityEnabled = playerESP;
-                else if (t.getCategory() != MobCategory.MISC)
+                else if (t.getCategory() != MobCategory.MISC || isMiscMob(t))
                     entityEnabled = mobESP;
                 else if (p.contains("boat") || p.contains("raft") || p.contains("minecart"))
                     entityEnabled = vehicleESP;
@@ -121,10 +135,14 @@ public class ESPConfig {
                 allEntityESP    = data.allEntityESP;
                 showOutline     = data.showOutline;
                 showHitbox      = data.showHitbox;
-                if (data.entityOverrides != null) entityOverrides = data.entityOverrides;
+                if (data.entityOverrides != null)
+                    entityOverrides = new ConcurrentHashMap<>(data.entityOverrides);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            // Corrupted or unreadable config — reset to defaults
+            playerESP = true;
+            applyPlayerPreset(true);
+            save();
         }
     }
 
