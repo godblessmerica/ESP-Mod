@@ -1,4 +1,4 @@
-package com.spectralesp.client;
+package com.espmod.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
@@ -32,7 +32,7 @@ public class ESPConfigScreen extends Screen {
     static KeyMapping listeningFor = null;
 
     public ESPConfigScreen(Screen parent) {
-        super(Minecraft.getInstance(), Minecraft.getInstance().font, Component.literal("Spectral ESP"));
+        super(Minecraft.getInstance(), Minecraft.getInstance().font, Component.literal("ESP Mod"));
         this.parent = parent;
     }
 
@@ -72,9 +72,9 @@ public class ESPConfigScreen extends Screen {
 
         addRenderableWidget(list);
 
-        int titleTextW = this.font.width("Spectral ESP");
+        int titleTextW = this.font.width("ESP Mod");
         var titleLabel = new StringWidget(
-            Component.literal("Spectral ESP").withStyle(s -> s.withColor(0xFFFFFF)), this.font);
+            Component.literal("ESP Mod").withStyle(s -> s.withColor(0xFFFFFF)), this.font);
         titleLabel.setX(boxX + (BOX_W - titleTextW) / 2);
         titleLabel.setY(boxY + (TITLE_H - 8) / 2);
         titleLabel.setWidth(titleTextW);

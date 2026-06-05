@@ -1,4 +1,4 @@
-package com.spectralesp.client;
+package com.espmod.client;
 
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;

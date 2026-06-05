@@ -1,4 +1,4 @@
-package com.spectralesp.client;
+package com.espmod.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -112,7 +112,7 @@ public class ESPConfig {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance()
-            .getConfigDir().resolve("spectral-esp.json");
+            .getConfigDir().resolve("espmod.json");
 
     public static void load() {
         if (!Files.exists(CONFIG_PATH)) {

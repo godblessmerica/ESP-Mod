@@ -1,18 +1,19 @@
 {
 	"schemaVersion": 1,
-	"id": "spectralesp",
+	"id": "espmod",
 	"version": "${version}",
-	"name": "Spectral ESP",
+	"name": "ESP Mod",
 	"description": "An ESP mod that shows entity outlines and hitboxes through walls.",
 	"authors": ["godblessmerica"],
 	"license": "MIT",
+	"icon": "assets/espmod/icon.png",
 	"environment": "client",
 	"entrypoints": {
 		"client": [
-			"com.spectralesp.client.PlayerESPClient"
+			"com.espmod.client.PlayerESPClient"
 		],
 		"modmenu": [
-			"com.spectralesp.client.ModMenuIntegration"
+			"com.espmod.client.ModMenuIntegration"
 		]
 	},
 	"suggests": {
@@ -20,7 +21,7 @@
 	},
 	"mixins": [
 		{
-			"config": "spectral_esp.client.mixins.json",
+			"config": "espmod.client.mixins.json",
 			"environment": "client"
 		}
 	],

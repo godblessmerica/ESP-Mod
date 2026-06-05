@@ -1,4 +1,4 @@
-package com.spectralesp.client;
+package com.espmod.client;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;

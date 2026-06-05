@@ -1,4 +1,4 @@
-package com.spectralesp.client;
+package com.espmod.client;
 
 public class EntitySettings {
     public boolean enabled;

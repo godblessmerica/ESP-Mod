@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "com.spectralesp.client.mixin",
+	"package": "com.espmod.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
 		"EntityMixin"

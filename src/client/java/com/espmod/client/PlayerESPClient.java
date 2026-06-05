@@ -1,4 +1,4 @@
-package com.spectralesp.client;
+package com.espmod.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -11,9 +11,9 @@ import org.lwjgl.glfw.GLFW;
 
 public class PlayerESPClient implements ClientModInitializer {
 
-    // Custom keybind category — shows as "Spectral ESP" in Controls screen
+    // Custom keybind category — shows as "ESP Mod" in Controls screen
     public static final KeyMapping.Category CATEGORY =
-        KeyMapping.Category.register(Identifier.fromNamespaceAndPath("spectralesp", "spectral_esp"));
+        KeyMapping.Category.register(Identifier.fromNamespaceAndPath("espmod", "esp_mod"));
 
     public static KeyMapping toggleKey;
     public static KeyMapping openScreenKey;
@@ -23,14 +23,14 @@ public class PlayerESPClient implements ClientModInitializer {
         ESPConfig.load();
 
         toggleKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-            "key.spectralesp.toggle",
+            "key.espmod.toggle",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_G,
             CATEGORY
         ));
 
         openScreenKey = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-            "key.spectralesp.open_screen",
+            "key.espmod.open_screen",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_BACKSLASH,
             CATEGORY

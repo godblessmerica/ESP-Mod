@@ -5,7 +5,7 @@ plugins {
 
 version = project.mod_version
 group = project.maven_group
-base.archivesName = "spectral-esp"
+base.archivesName = "esp-mod"
 
 repositories {
 	flatDir { dirs 'libs' }
@@ -15,7 +15,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"spectralesp" {
+		"espmod" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}

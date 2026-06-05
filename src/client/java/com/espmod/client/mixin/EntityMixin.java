@@ -1,7 +1,7 @@
-package com.spectralesp.client.mixin;
+package com.espmod.client.mixin;
 
-import com.spectralesp.client.ESPConfig;
-import com.spectralesp.client.EntitySettings;
+import com.espmod.client.ESPConfig;
+import com.espmod.client.EntitySettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
