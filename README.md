@@ -3,7 +3,7 @@
 [![Platform](https://img.shields.io/badge/platform-Minecraft%2026.3-62B47A?style=flat-square)](#)
 [![Mod Loader](https://img.shields.io/badge/mod%20loader-Fabric-DBD0B4?style=flat-square)](https://fabricmc.net)
 [![License](https://img.shields.io/badge/license-MIT-d580ff?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/source%20version-1.1.0-00e5ff?style=flat-square)](gradle.properties)
+[![Version](https://img.shields.io/badge/source%20version-2.0.0-00e5ff?style=flat-square)](gradle.properties)
 
 A client-side Fabric mod that shows entity outlines, entity hitboxes, and selected block boxes through walls, with an in-game configuration menu.
 
@@ -15,7 +15,7 @@ A client-side Fabric mod that shows entity outlines, entity hitboxes, and select
 
 1. Install [Fabric Loader](https://fabricmc.net/use/installer/)
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for Minecraft 26.3 and place it in your mods folder
-3. Build v1.1.0 using the instructions below, or download the matching 26.3 jar from [Releases](https://github.com/godblessmerica/ESP-Mod/releases) once published, and place it in your mods folder
+3. Build v2.0.0 using the instructions below, or download the matching 26.3 jar from [Releases](https://github.com/godblessmerica/ESP-Mod/releases) once published, and place it in your mods folder
 4. Launch Minecraft with the Fabric profile
 
 ## Requirements
@@ -82,7 +82,7 @@ The ESP toggle and menu bindings are rebindable in **Options → Controls → ES
 
 ## Building from Source
 
-With JDK 25 or newer, run `./gradlew build` (`gradlew.bat build` on Windows). The installable jar is `build/libs/esp-mod-1.1.0.jar`.
+With JDK 25 or newer, run `./gradlew build` (`gradlew.bat build` on Windows). The installable jar is `build/libs/esp-mod-2.0.0.jar`.
 
 ## License
 [MIT](LICENSE)
