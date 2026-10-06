@@ -3,6 +3,7 @@ package com.espmod.client;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -74,10 +76,18 @@ public class BlockScanner {
     }
 
     public static void rescanAll() {
-        chunkFound.clear();
+        Set<Block> tracked = BlockESPConfig.getBlockLookup().keySet();
+        chunkFound.values().forEach(matches -> matches.keySet().retainAll(tracked));
         pending.clear();
+        if (tracked.isEmpty()) {
+            chunkFound.clear();
+            return;
+        }
+        Minecraft client = Minecraft.getInstance();
+        ChunkPos center = client != null && client.player != null ? client.player.chunkPosition() : ChunkPos.ZERO;
         // ponytail: one chunk per tick; scan sections per tick if dense chunks cause measurable stalls.
-        pending.addAll(loadedChunks.keySet());
+        loadedChunks.keySet().stream().sorted(Comparator.comparingInt(pos -> pos.distanceSquared(center)))
+            .forEach(pending::add);
     }
 
     public static void clear() {
@@ -87,8 +97,9 @@ public class BlockScanner {
     }
 
     public static void onBlockChanged(BlockPos pos, BlockState oldState, BlockState newState) {
-        Map<Block, Set<BlockPos>> matches = chunkFound.get(ChunkPos.containing(pos));
-        if (matches == null) return; // A queued scan will read the updated chunk.
+        ChunkPos chunkPos = ChunkPos.containing(pos);
+        if (!loadedChunks.containsKey(chunkPos)) return;
+        Map<Block, Set<BlockPos>> matches = chunkFound.computeIfAbsent(chunkPos, key -> new HashMap<>());
         Block oldBlock = oldState.getBlock();
         Set<BlockPos> oldPositions = matches.get(oldBlock);
         if (oldPositions != null) {
