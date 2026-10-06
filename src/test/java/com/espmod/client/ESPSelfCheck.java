@@ -80,6 +80,9 @@ public class ESPSelfCheck {
         assert matches.get(Blocks.GOLD_ORE).contains(pos);
         BlockScanner.onBlockChanged(pos, Blocks.GOLD_ORE.defaultBlockState(), Blocks.AIR.defaultBlockState());
         assert matches.isEmpty();
+        assert !cache.containsKey(ChunkPos.containing(pos)) : "Empty chunk caches must be removed";
+        BlockScanner.onBlockChanged(pos, Blocks.AIR.defaultBlockState(), Blocks.STONE.defaultBlockState());
+        assert !cache.containsKey(ChunkPos.containing(pos)) : "Untracked updates must not allocate chunk caches";
         // Loaded chunks awaiting their first scan must accept updates on both sides of a boundary.
         BlockPos left = new BlockPos(15, 64, 0);
         BlockPos right = new BlockPos(16, 64, 0);
@@ -116,6 +119,21 @@ public class ESPSelfCheck {
         BlockScanner.scanNext();
         assert BlockScanner.getFound().isEmpty() : "Cleared chunks must not reappear";
         assert !Blocks.OAK_STAIRS.defaultBlockState().isAir();
-        System.out.println("ESP self-check passed: config safety, chunk-boundary updates, nearby rescans and cache reset.");
+        assert BlockESPRenderer.isChunkInRange(ChunkPos.ZERO, 15.5, 0.5, 0);
+        assert BlockESPRenderer.isChunkInRange(new ChunkPos(1, 0), 15.5, 0.5, 1);
+        assert !BlockESPRenderer.isChunkInRange(new ChunkPos(1, 0), 15.5, 0.5, 0.99);
+        assert BlockESPRenderer.isChunkInRange(new ChunkPos(-1, -1), -0.5, -0.5, 0);
+        assert !BlockESPRenderer.isChunkInRange(new ChunkPos(1, 1), 15.5, 15.5, 1);
+        // Verify the chunk shortcut never hides a block that passes the original distance check.
+        for (int x = -40; x <= 40; x++) {
+            for (int z = -40; z <= 40; z++) {
+                double dx = x + 0.5 - 3.25, dz = z + 0.5 + 7.75;
+                if (dx * dx + dz * dz <= 32 * 32) {
+                    assert BlockESPRenderer.isChunkInRange(ChunkPos.containing(new BlockPos(x, 64, z)),
+                        3.25, -7.75, 32 * 32) : "Chunk filtering hid an in-range block";
+                }
+            }
+        }
+        System.out.println("ESP self-check passed: config safety, chunk updates, cache cleanup and conservative range filtering.");
     }
 }

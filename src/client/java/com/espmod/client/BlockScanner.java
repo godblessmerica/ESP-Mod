@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,12 +71,14 @@ public class BlockScanner {
                 }
             }
         }
-        chunkFound.put(chunk.getPos(), matches);
+        if (matches.isEmpty()) chunkFound.remove(chunk.getPos());
+        else chunkFound.put(chunk.getPos(), matches);
     }
 
     public static void rescanAll() {
         Set<Block> tracked = BlockESPConfig.getBlockLookup().keySet();
         chunkFound.values().forEach(matches -> matches.keySet().retainAll(tracked));
+        chunkFound.values().removeIf(Map::isEmpty);
         pending.clear();
         if (tracked.isEmpty()) {
             chunkFound.clear();
@@ -99,20 +100,27 @@ public class BlockScanner {
     public static void onBlockChanged(BlockPos pos, BlockState oldState, BlockState newState) {
         ChunkPos chunkPos = ChunkPos.containing(pos);
         if (!loadedChunks.containsKey(chunkPos)) return;
-        Map<Block, Set<BlockPos>> matches = chunkFound.computeIfAbsent(chunkPos, key -> new HashMap<>());
+        Map<Block, Set<BlockPos>> matches = chunkFound.get(chunkPos);
+        Block newBlock = newState.getBlock();
+        boolean tracked = BlockESPConfig.getBlockLookup().containsKey(newBlock);
+        if (matches == null) {
+            if (!tracked) return;
+            matches = new HashMap<>();
+            chunkFound.put(chunkPos, matches);
+        }
         Block oldBlock = oldState.getBlock();
         Set<BlockPos> oldPositions = matches.get(oldBlock);
         if (oldPositions != null) {
             oldPositions.remove(pos);
             if (oldPositions.isEmpty()) matches.remove(oldBlock);
         }
-        Block newBlock = newState.getBlock();
-        if (BlockESPConfig.getBlockLookup().containsKey(newBlock)) {
+        if (tracked) {
             matches.computeIfAbsent(newBlock, key -> new HashSet<>()).add(pos.immutable());
         }
+        if (matches.isEmpty()) chunkFound.remove(chunkPos);
     }
 
-    public static Collection<Map<Block, Set<BlockPos>>> getFound() {
-        return chunkFound.values();
+    public static Map<ChunkPos, Map<Block, Set<BlockPos>>> getFound() {
+        return chunkFound;
     }
 }
