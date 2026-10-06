@@ -5,36 +5,30 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.gizmos.GizmoStyle;
 import net.minecraft.gizmos.Gizmos;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.world.entity.EntityType;
+import java.util.Map;
 
 public class HitboxRenderer {
 
-    private static final int COLOR_PLAYER = 0xFFFF5555;
-    private static final int COLOR_MOB    = 0xFFFFAA00;
-    private static final int COLOR_ENTITY = 0xFFFFFF55;
-
     public static void register() {
-        LevelRenderEvents.END_EXTRACTION.register(context -> {
-            if (!ESPConfig.enabled || !ESPConfig.showHitbox) return;
+        LevelRenderEvents.BEFORE_GIZMOS.register(context -> {
+            if (!EntityESPConfig.enabled || !EntityESPConfig.showHitbox) return;
 
             Minecraft mc = Minecraft.getInstance();
             if (mc.level == null || mc.player == null) return;
 
-            try (var collection = context.levelRenderer().collectPerFrameGizmos()) {
+            Map<EntityType<?>, EntityESPEntry> lookup = EntityESPConfig.getEntityLookup();
+            if (lookup.isEmpty()) return;
+
+            double range = EntityESPConfig.getEffectiveHitboxRange();
+            double rangeSquared = range * range;
+            try (var collection = context.levelRenderer().collectPerFrameRenderThreadGizmos()) {
                 for (Entity entity : mc.level.entitiesForRendering()) {
                     if (entity == mc.player) continue;
-
-                    EntitySettings ov = ESPConfig.getOverride(entity);
-                    if (ov == null || !ov.enabled) continue;
-
-                    int color;
-                    if (entity instanceof Player)   color = COLOR_PLAYER;
-                    else if (entity instanceof Mob) color = COLOR_MOB;
-                    else                            color = COLOR_ENTITY;
-
-                    Gizmos.cuboid(entity.getBoundingBox(), GizmoStyle.stroke(color, 2.5f)).setAlwaysOnTop();
+                    if (entity.distanceToSqr(mc.player) > rangeSquared) continue;
+                    EntityESPEntry entry = lookup.get(entity.getType());
+                    if (entry == null || !entry.enabled) continue;
+                    Gizmos.cuboid(entity.getBoundingBox(), GizmoStyle.stroke(entry.color, 2.5f)).setAlwaysOnTop();
                 }
             }
         });

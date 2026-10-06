@@ -1,5 +1,5 @@
 {
-    "key.espmod.toggle": "Toggle ESP On/Off",
     "key.espmod.open_screen": "Open ESP Mod Menu",
+    "key.espmod.toggle": "Toggle ESP",
     "key.category.espmod.esp_mod": "ESP Mod"
 }

@@ -5,26 +5,26 @@ import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.StringWidget;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
+import java.util.List;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-
-import java.util.List;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+import java.util.function.IntSupplier;
 
 public class ESPConfigScreen extends Screen {
 
     private final Screen parent;
 
     private static final int BOX_W  = 250;
-    private static final int BOX_H  = 220;
+    private static final int BOX_H  = 260;
     private static final int TITLE_H  = 22;
     private static final int FOOTER_H = 32;
 
@@ -45,50 +45,25 @@ public class ESPConfigScreen extends Screen {
             BOX_W, BOX_H - TITLE_H - FOOTER_H, boxY + TITLE_H, 22);
         list.setX(boxX);
 
-        list.addEntry(new SettingsList.HeaderEntry("ESP Display"));
-        list.addEntry(new SettingsList.ToggleEntry("Show Outline (glow)",
-            () -> ESPConfig.showOutline, v -> ESPConfig.showOutline = v));
-        list.addEntry(new SettingsList.ToggleEntry("Show Hitbox (box)",
-            () -> ESPConfig.showHitbox, v -> ESPConfig.showHitbox = v));
+        list.addEntry(new SettingsList.ButtonEntry("Entity ESP...",
+            () -> this.minecraft.gui.setScreen(new EntityESPScreen(this))));
 
-        list.addEntry(new SettingsList.HeaderEntry("Entities"));
-        list.addEntry(new SettingsList.ButtonEntry("Clear All",
-            () -> ESPConfig.resetAll()));
-        list.addEntry(new SettingsList.ToggleEntry("Players",
-            () -> ESPConfig.playerESP, v -> {
-                ESPConfig.playerESP = v;
-                if (ESPConfig.allEntityESP) { ESPConfig.allEntityESP = false; ESPConfig.applyAllEntitiesPreset(false); }
-                else ESPConfig.applyPlayerPreset(v);
-            }));
-        list.addEntry(new SettingsList.ToggleEntry("Mobs",
-            () -> ESPConfig.mobESP, v -> {
-                ESPConfig.mobESP = v;
-                if (ESPConfig.allEntityESP) { ESPConfig.allEntityESP = false; ESPConfig.applyAllEntitiesPreset(false); }
-                else ESPConfig.applyMobPreset(v);
-            }));
-        list.addEntry(new SettingsList.ToggleEntry("Vehicles",
-            () -> ESPConfig.vehicleESP, v -> {
-                ESPConfig.vehicleESP = v;
-                if (ESPConfig.allEntityESP) { ESPConfig.allEntityESP = false; ESPConfig.applyAllEntitiesPreset(false); }
-                else ESPConfig.applyVehiclePreset(v);
-            }));
-        list.addEntry(new SettingsList.ToggleEntry("Technical",
-            () -> ESPConfig.technicalESP, v -> {
-                ESPConfig.technicalESP = v;
-                if (ESPConfig.allEntityESP) { ESPConfig.allEntityESP = false; ESPConfig.applyAllEntitiesPreset(false); }
-                else ESPConfig.applyTechnicalPreset(v);
-            }));
-        list.addEntry(new SettingsList.ToggleEntry("All Entities",
-            () -> ESPConfig.allEntityESP, v -> {
-                ESPConfig.allEntityESP = v;
-                ESPConfig.applyAllEntitiesPreset(v);
-            }));
-        list.addEntry(new SettingsList.ButtonEntry("Advanced Entity Settings...",
-            () -> this.minecraft.setScreen(new AdvancedESPScreen(this))));
+        list.addEntry(new SettingsList.ButtonEntry("Block ESP...",
+            () -> this.minecraft.gui.setScreen(new BlockESPScreen(this))));
+
+        list.addEntry(new SettingsList.HeaderEntry("Settings"));
+        list.addEntry(new SettingsList.SliderEntry("Box Range", 8, 512,
+            EntityESPConfig::getEffectiveHitboxRange,
+            v -> EntityESPConfig.hitboxRange = v));
+        list.addEntry(new SettingsList.ButtonEntry("Use Render Distance", () -> {
+            EntityESPConfig.hitboxRange = 0;
+            EntityESPConfig.save();
+            this.minecraft.gui.setScreen(new ESPConfigScreen(parent));
+        }));
 
         list.addEntry(new SettingsList.HeaderEntry("Controls"));
-        list.addEntry(new SettingsList.KeyBindEntry("Toggle ESP",      ESPModClient.toggleKey));
-        list.addEntry(new SettingsList.KeyBindEntry("Open Menu",       ESPModClient.openScreenKey));
+        list.addEntry(new SettingsList.KeyBindEntry("Open Menu",   ESPModClient.openScreenKey));
+        list.addEntry(new SettingsList.KeyBindEntry("Toggle ESP",  ESPModClient.toggleKey));
 
         addRenderableWidget(list);
 
@@ -102,15 +77,28 @@ public class ESPConfigScreen extends Screen {
         addRenderableWidget(titleLabel);
 
         addRenderableWidget(Button.builder(Component.literal("Done"),
-                btn -> { ESPConfig.save(); listeningFor = null; this.minecraft.setScreen(parent); })
+                btn -> onClose())
             .bounds(boxX + BOX_W / 2 - 60, boxY + BOX_H - 26, 120, 20).build());
+
+        addRenderableWidget(CycleButton.<Boolean>builder(
+                val -> val ? Component.literal("ON").withStyle(s -> s.withColor(0x55FF55))
+                           : Component.literal("OFF").withStyle(s -> s.withColor(0xFF5555)),
+                EntityESPConfig.enabled || BlockESPConfig.enabled)
+            .withValues(List.of(true, false)).displayOnlyValue()
+            .create(boxX + BOX_W - 52, boxY + 3, 46, 16, Component.empty(),
+                (b, val) -> {
+                    EntityESPConfig.enabled = val;
+                    BlockESPConfig.enabled  = val;
+                    EntityESPConfig.save();
+                    BlockESPConfig.save();
+                }));
     }
 
     @Override
     public boolean keyPressed(KeyEvent event) {
         if (listeningFor != null) {
             InputConstants.Key newKey = InputConstants.getKey(event);
-            if (newKey.getValue() != org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
+            if (newKey.getValue() != InputConstants.KEY_ESCAPE) {
                 listeningFor.setKey(newKey);
                 KeyMapping.resetMapping();
                 this.minecraft.options.save();
@@ -132,15 +120,17 @@ public class ESPConfigScreen extends Screen {
     }
 
     @Override
-    public void onClose() { ESPConfig.save(); listeningFor = null; this.minecraft.setScreen(parent); }
+    public void onClose() { listeningFor = null; this.minecraft.gui.setScreen(parent); }
 
-    static class SettingsList extends AbstractSelectionList<SettingsList.BaseEntry> {
+    @Override public void removed() { listeningFor = null; EntityESPConfig.save(); }
+
+    static class SettingsList extends ContainerObjectSelectionList<SettingsList.BaseEntry> {
         SettingsList(Minecraft mc, int w, int h, int y, int ih) { super(mc, w, h, y, ih); }
         @Override public int addEntry(BaseEntry e) { return super.addEntry(e); }
-        @Override protected void updateWidgetNarration(NarrationElementOutput o) {}
         @Override protected void extractListBackground(GuiGraphicsExtractor g) {}
 
         static class HeaderEntry extends BaseEntry {
+            @Override public List<? extends AbstractWidget> children() { return List.of(widget); }
             private final StringWidget widget;
             HeaderEntry(String t) {
                 this.widget = new StringWidget(
@@ -154,50 +144,15 @@ public class ESPConfigScreen extends Screen {
                 widget.setWidth(w - 12); widget.setHeight(h);
                 widget.extractRenderState(g, mx, my, delta);
             }
-            @Override public boolean mouseClicked(MouseButtonEvent e, boolean bl) { return false; }
-        }
-
-        static class ToggleEntry extends BaseEntry {
-            private final StringWidget labelWidget;
-            private final BooleanSupplier getter;
-            private final Consumer<Boolean> setter;
-            private final CycleButton<Boolean> btn;
-
-            ToggleEntry(String label, BooleanSupplier getter, Consumer<Boolean> setter) {
-                this.getter = getter; this.setter = setter;
-                this.labelWidget = new StringWidget(Component.literal(label), Minecraft.getInstance().font);
-                this.btn = CycleButton.<Boolean>builder(
-                        val -> val ? Component.literal("Show").withStyle(s -> s.withColor(0x55FF55))
-                                   : Component.literal("Hide").withStyle(s -> s.withColor(0xFF5555)),
-                        getter.getAsBoolean())
-                    .withValues(List.of(true, false)).displayOnlyValue()
-                    .create(0, 0, 65, 20, Component.empty(),
-                        (b, val) -> { setter.accept(val); ESPConfig.save(); });
-            }
-
-            @Override
-            public void extractContent(GuiGraphicsExtractor g, int mx, int my, boolean hovered, float delta) {
-                int cx = getContentX(), cy = getContentY(), w = getContentWidth(), h = getContentHeight();
-                g.fill(cx, cy, cx + w, cy + h, hovered ? 0xFF3A3A3A : 0xFF111111);
-                labelWidget.setX(cx + 6); labelWidget.setY(cy + (h - 8) / 2);
-                labelWidget.setWidth(w - 77); labelWidget.setHeight(8);
-                labelWidget.extractRenderState(g, mx, my, delta);
-                btn.setValue(getter.getAsBoolean());
-                btn.setX(cx + w - 71); btn.setY(cy + 1);
-                btn.setWidth(65); btn.setHeight(h - 2);
-                btn.extractRenderState(g, mx, my, delta);
-            }
-            @Override public boolean mouseClicked(MouseButtonEvent e, boolean bl) { return btn.mouseClicked(e, bl); }
         }
 
         static class KeyBindEntry extends BaseEntry {
-            private final String label;
+            @Override public List<? extends AbstractWidget> children() { return List.of(keyBtn); }
             private final KeyMapping mapping;
             private final StringWidget labelWidget;
             private final Button keyBtn;
 
             KeyBindEntry(String label, KeyMapping mapping) {
-                this.label   = label;
                 this.mapping = mapping;
                 this.labelWidget = new StringWidget(Component.literal(label), Minecraft.getInstance().font);
                 this.keyBtn  = Button.builder(KeyMappingHelper.getBoundKeyOf(mapping).getDisplayName(), b -> {
@@ -225,13 +180,10 @@ public class ESPConfigScreen extends Screen {
                 keyBtn.extractRenderState(g, mx, my, delta);
             }
 
-            @Override
-            public boolean mouseClicked(MouseButtonEvent e, boolean bl) {
-                return keyBtn.mouseClicked(e, bl);
-            }
         }
 
         static class ButtonEntry extends BaseEntry {
+            @Override public List<? extends AbstractWidget> children() { return List.of(btn); }
             private final Button btn;
             ButtonEntry(String label, Runnable action) {
                 this.btn = Button.builder(Component.literal(label), b -> action.run())
@@ -244,14 +196,47 @@ public class ESPConfigScreen extends Screen {
                 btn.setWidth(200); btn.setHeight(h - 2);
                 btn.extractRenderState(g, mx, my, delta);
             }
-            @Override public boolean mouseClicked(MouseButtonEvent e, boolean bl) { return btn.mouseClicked(e, bl); }
         }
 
+        static class SliderEntry extends BaseEntry {
+            @Override public List<? extends AbstractWidget> children() { return List.of(slider); }
+            private final StringWidget labelWidget;
+            private final AbstractSliderButton slider;
 
+            SliderEntry(String label, int min, int max, IntSupplier getter, IntConsumer setter) {
+                final int fMin = min, fMax = max;
+                this.labelWidget = new StringWidget(Component.literal(label), Minecraft.getInstance().font);
+                double initial = (double)(getter.getAsInt() - fMin) / (fMax - fMin);
+                this.slider = new AbstractSliderButton(0, 0, 120, 20,
+                        Component.literal(getter.getAsInt() + " blocks"), initial) {
+                    @Override protected void updateMessage() {
+                        setMessage(Component.literal(
+                            (int) Math.round(fMin + value * (fMax - fMin)) + " blocks"));
+                    }
+                    @Override protected void applyValue() {
+                        setter.accept((int) Math.round(fMin + value * (fMax - fMin)));
+                    }
+                };
+            }
 
-        abstract static class BaseEntry extends AbstractSelectionList.Entry<BaseEntry> {
+            @Override
+            public void extractContent(GuiGraphicsExtractor g, int mx, int my, boolean hovered, float delta) {
+                int cx = getContentX(), cy = getContentY(), w = getContentWidth(), h = getContentHeight();
+                g.fill(cx, cy, cx + w, cy + h, hovered ? 0xFF3A3A3A : 0xFF111111);
+                labelWidget.setX(cx + 6); labelWidget.setY(cy + (h - 8) / 2);
+                labelWidget.setWidth(w - 134); labelWidget.setHeight(8);
+                labelWidget.extractRenderState(g, mx, my, delta);
+                slider.setX(cx + w - 128); slider.setY(cy + 1);
+                slider.setWidth(122); slider.setHeight(h - 2);
+                slider.extractRenderState(g, mx, my, delta);
+            }
+
+        }
+
+        abstract static class BaseEntry extends ContainerObjectSelectionList.Entry<BaseEntry> {
+            @Override public List<? extends AbstractWidget> children() { return List.of(); }
+            @Override public List<? extends NarratableEntry> narratables() { return children(); }
             @Override public abstract void extractContent(GuiGraphicsExtractor g, int mx, int my, boolean hovered, float delta);
-            @Override public abstract boolean mouseClicked(MouseButtonEvent e, boolean bl);
         }
     }
 }
