@@ -12,8 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientLevel.class)
 public class ClientLevelMixin {
 
-    @Inject(method = "sendBlockUpdated", at = @At("HEAD"))
-    private void espOnBlockChanged(BlockPos pos, BlockState oldState, BlockState newState, int flags, CallbackInfo ci) {
+    // Unlike sendBlockUpdated, this runs for changed states regardless of the notification flags.
+    @Inject(method = "setBlocksDirty", at = @At("HEAD"))
+    private void espOnBlockChanged(BlockPos pos, BlockState oldState, BlockState newState, CallbackInfo ci) {
         BlockScanner.onBlockChanged(pos, oldState, newState);
     }
 }
