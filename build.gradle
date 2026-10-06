@@ -5,10 +5,10 @@ plugins {
 
 version = project.mod_version
 group = project.maven_group
-base.archivesName = "esp-mod"
+base.archivesName = project.archives_base_name
 
 repositories {
-	flatDir { dirs 'libs' }
+	maven { url 'https://api.modrinth.com/maven' }
 }
 
 loom {
@@ -28,8 +28,8 @@ dependencies {
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-	// Mod Menu — local jar, compile-only (not bundled, user installs it separately)
-	compileOnly files('libs/modmenu-18.0.0-beta.1.jar')
+	// Mod Menu — compile-only (not bundled, user installs it separately)
+	compileOnly "maven.modrinth:modmenu:${project.modmenu_version}"
 }
 
 processResources {
@@ -49,6 +49,27 @@ java {
 	withSourcesJar()
 	sourceCompatibility = JavaVersion.VERSION_25
 	targetCompatibility = JavaVersion.VERSION_25
+}
+
+sourceSets.test {
+	compileClasspath += sourceSets.client.output + sourceSets.client.compileClasspath
+	runtimeClasspath += sourceSets.client.output + sourceSets.client.runtimeClasspath
+}
+
+tasks.register('selfCheck', JavaExec) {
+	dependsOn testClasses, clientClasses
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.espmod.client.ESPSelfCheck'
+	enableAssertions = true
+	workingDir = layout.buildDirectory.dir('self-check').get().asFile
+	doFirst { workingDir.mkdirs() }
+}
+
+check.dependsOn selfCheck
+
+test {
+	// This assertion-based check runs via selfCheck, without a test framework.
+	exclude '**/ESPSelfCheck.class'
 }
 
 jar {

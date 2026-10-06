@@ -3,7 +3,8 @@
 	"package": "com.espmod.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"EntityMixin"
+		"EntityMixin",
+		"ClientLevelMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
