@@ -3,7 +3,7 @@
 [![Platform](https://img.shields.io/badge/platform-Minecraft%2026.3-62B47A?style=flat-square)](#)
 [![Mod Loader](https://img.shields.io/badge/mod%20loader-Fabric-DBD0B4?style=flat-square)](https://fabricmc.net)
 [![License](https://img.shields.io/badge/license-MIT-d580ff?style=flat-square)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.1.0-00e5ff?style=flat-square)](../../releases/latest)
+[![Version](https://img.shields.io/badge/version-1.1.0-00e5ff?style=flat-square)](../../releases/latest)
 
 A client-side Fabric mod that shows entity outlines, entity hitboxes, and selected block boxes through walls, with an in-game configuration menu.
 
@@ -64,7 +64,7 @@ Both keys are rebindable in **Options → Controls → ESP Mod** or directly in 
 
 ## Build and Check
 
-With JDK 25 or newer, run `./gradlew build` (`gradlew.bat build` on Windows). The build includes an assertion-based `selfCheck` covering config round trips, malformed config preservation, duplicate IDs, and block cache updates. The installable jar is `build/libs/esp-mod-2.1.0.jar`.
+With JDK 25 or newer, run `./gradlew build` (`gradlew.bat build` on Windows). The build includes an assertion-based `selfCheck` covering config round trips, malformed config preservation, duplicate IDs, and block cache updates. The installable jar is `build/libs/esp-mod-1.1.0.jar`.
 
 The project follows the included 26.3 template's split main/client source sets, Java 25 target, and Gradle 9.7.1 wrapper. Loom is pinned to 1.18.2 for repeatable builds. Minecraft's SDL input migration is described in the [Fabric 26.3 porting notes](https://www.fabricmc.net/2026/09/15/263.html).
 
