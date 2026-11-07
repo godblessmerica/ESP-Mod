@@ -11,11 +11,6 @@ A client-side Fabric mod that shows entity outlines, entity hitboxes, and select
 
 > This mod is intended for use on servers you own or have explicit permission to use it on. Using ESP mods on public or third-party servers likely violates their rules and may result in a ban. The author is not responsible for any consequences resulting from misuse of this mod. Use it at your own risk.
 
-> [!IMPORTANT]
-> **TKCL Studio is developed almost entirely using AI.** It’s written using [OpenAI’s Codex](https://openai.com/codex/), and directed and tested by a human. The project also uses existing open-source libraries, which retain their own authorship and licenses.
->
-> Please keep discussions on the tool rather than AI. If you disagree with the use of AI or don't trust it, feel free to not use this tool.
-
 ## Installation
 
 1. Install [Fabric Loader](https://fabricmc.net/use/installer/)
