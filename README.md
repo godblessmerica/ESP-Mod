@@ -13,6 +13,7 @@ A client-side Fabric mod that shows entity outlines, entity hitboxes, and select
 
 > [!IMPORTANT]
 > **ESP Mod is developed almost entirely using AI.** It’s written using [OpenAI’s Codex](https://openai.com/codex/), and directed and tested by a human.
+>
 > Please keep discussions on the project rather than AI. If you disagree with the use of AI or don't trust it, feel free to not use this tool.
 
 ## Installation
